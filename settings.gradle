@@ -1,1 +1,1 @@
-include ':app', ':WaterFallLib', ':WaterFallLib'
+include ':WaterFallDemo', ':WaterFallLib', ':WaterFallLib'

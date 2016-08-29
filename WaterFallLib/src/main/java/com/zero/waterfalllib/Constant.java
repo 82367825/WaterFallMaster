@@ -1,4 +1,4 @@
-package com.zero.waterfalllib.util;
+package com.zero.waterfalllib;
 
 /**
  * @author linzewu
