@@ -45,11 +45,9 @@ public class PlusExecutor extends ThreadPoolExecutor {
         super.beforeExecute(thread, r);
         mPauseLock.lock();
         try {
-            if (mIsPause) {
-                
-            }
-        } catch () {
-            
+            while (mIsPause) mUnPauseCondition.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             mPauseLock.unlock(); 
         }
@@ -59,14 +57,6 @@ public class PlusExecutor extends ThreadPoolExecutor {
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
-        mPauseLock.lock();
-        try {
-            
-        } catch () {
-            
-        } finally {
-            
-        }
         LogUtils.d(TAG, Thread.currentThread().getName() + "execute complete.");
     }
 
@@ -74,5 +64,28 @@ public class PlusExecutor extends ThreadPoolExecutor {
     protected void terminated() {
         super.terminated();
         LogUtils.d(TAG, "Thread Pool finish.");
+    }
+    
+    public void pause() {
+        mPauseLock.lock();
+        try {
+            mIsPause = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mPauseLock.unlock();
+        }
+    }
+    
+    public void restart() {
+        mPauseLock.lock();
+        try {
+            mIsPause = false;
+            mUnPauseCondition.signalAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mPauseLock.unlock();
+        }
     }
 }

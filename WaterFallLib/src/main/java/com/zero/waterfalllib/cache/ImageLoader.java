@@ -10,6 +10,8 @@ import android.util.Log;
 import android.widget.ImageView;
 
 
+import com.zero.waterfalllib.cache.executor.WFThreadPoolProxy;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,31 +76,7 @@ public class ImageLoader {
     // Default disk cache size in bytes
     private static final int DEFAULT_DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB  磁盘缓存大小
     
-    //线程池相关参数
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
-    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
-    private static final long KEEP_ALIVE = 10L;
     private static final int MESSAGE_POST_RESULT = 1;
-
-    /**
-     * ThreadFactory
-     * 线程工厂
-     * 为线程池提供创建新线程的功能
-     */
-    private static final ThreadFactory sThreadFactory = new ThreadFactory() {
-        private final AtomicInteger mCount = new AtomicInteger();
-        @Override
-        public Thread newThread(@NonNull Runnable r) {
-            return new Thread(r, "ImageLoad#" + mCount.getAndIncrement());
-        }
-    };
-    /**
-     * THREAD_POOL_EXECUTOR 线程池
-     * 自定义线程池 核心线程 + 非核心线程
-     */
-    private static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(), sThreadFactory);
-    
     
     /**
      * the context for the ImageLoader
@@ -281,7 +259,7 @@ public class ImageLoader {
      */
     public void loadBitmap(String url, ImageLoadListener imageLoadListener) {
         LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, -1, imageLoadListener);
-        THREAD_POOL_EXECUTOR.execute(loaderRunnable);
+        WFThreadPoolProxy.getInstance().execute(loaderRunnable);
     }
 
     /**
@@ -292,7 +270,7 @@ public class ImageLoader {
      */
     public void loadBitmap(String url, ImageView imageView, int errorBitmap) {
         LoaderRunnable loaderRunnable = new LoaderRunnable(url, imageView, errorBitmap, null);
-        THREAD_POOL_EXECUTOR.execute(loaderRunnable);
+        WFThreadPoolProxy.getInstance().execute(loaderRunnable);
     }
 
     /**

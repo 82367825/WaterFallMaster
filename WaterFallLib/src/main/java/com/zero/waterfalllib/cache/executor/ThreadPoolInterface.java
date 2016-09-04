@@ -6,10 +6,15 @@ package com.zero.waterfalllib.cache.executor;
  */
 public interface ThreadPoolInterface {
     
-    void init();
+    void execute(Runnable runnable);
     
-    void execute();
+    void execute(Runnable runnable, int priority);
     
-    void execute(int p);
+    void cancel(Runnable runnable);
     
+    void cancelAll();
+    
+    void pause();
+    
+    void restart();
 }
