@@ -1,8 +1,7 @@
 package com.zero.waterfalllib;
 
 import android.content.Context;
-
-import com.zero.waterfalllib.cache.ImageLoader;
+import com.zero.waterfalllib.cache.executor.WFThreadPoolProxy;
 
 /**
  * @author linzewu
@@ -23,13 +22,14 @@ public class WaterFallManager {
     
     
     public void init(Context context) {
-        ImageLoader.ImageLoaderBuilder imageLoaderBuilder = new ImageLoader.ImageLoaderBuilder()
-                .setDISK_CACHE_ENABLED()
-                .setDISK_CACHE_NAME()
-                .setDISK_CACHE_SIZE()
-                .setMEM_CACHE_SIZE()
-                .setMEN_CACHE_ENABLED()
-                .setLOAD_WAY_NOW();
-        ImageLoader.getInstance().init(context.getApplicationContext(), imageLoaderBuilder);
+        WFThreadPoolProxy.getInstance();
+//        ImageLoader.ImageLoaderBuilder imageLoaderBuilder = new ImageLoader.ImageLoaderBuilder()
+//                .setDISK_CACHE_ENABLED()
+//                .setDISK_CACHE_NAME()
+//                .setDISK_CACHE_SIZE()
+//                .setMEM_CACHE_SIZE()
+//                .setMEN_CACHE_ENABLED()
+//                .setLOAD_WAY_NOW();
+//        ImageLoader.getInstance().init(context.getApplicationContext(), imageLoaderBuilder);
     }
 }

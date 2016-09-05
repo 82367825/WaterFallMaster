@@ -12,7 +12,7 @@ public class WFThreadPoolProxy {
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int WF_THREAD_POOL_CORE_NUM = CPU_COUNT + 1;
     private static final int WF_THREAD_POOL_MAX_NUM = CPU_COUNT * 2 + 1;
-    private static final boolean WF_THREAD_POOL_IS_PRIORITY = true;
+    private static final boolean WF_THREAD_POOL_IS_PRIORITY = false;
     
     private static WFThreadPoolProxy sWfThreadPoolProxy;
     private ThreadPoolController mThreadPoolController;

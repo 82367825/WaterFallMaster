@@ -40,12 +40,19 @@ public class PlusExecutor extends ThreadPoolExecutor {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
     }
 
+    /**
+     * 在子线程thread中调用，在run()方法体调用之前调用
+     * @param thread
+     * @param r
+     */
     @Override
     protected void beforeExecute(Thread thread, Runnable r) {
         super.beforeExecute(thread, r);
         mPauseLock.lock();
         try {
-            while (mIsPause) mUnPauseCondition.await();
+            /* 如果线程池被暂停，让所有的准备运行的线程休眠 */
+            if (mIsPause) mUnPauseCondition.await();
+//            while (mIsPause) mUnPauseCondition.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -54,6 +61,11 @@ public class PlusExecutor extends ThreadPoolExecutor {
         LogUtils.d(TAG, thread.getName() + "ready to execute.");
     }
 
+    /**
+     * 在子线程thread中调用，在run()方法体调用之后调用
+     * @param r
+     * @param t
+     */
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
@@ -65,7 +77,11 @@ public class PlusExecutor extends ThreadPoolExecutor {
         super.terminated();
         LogUtils.d(TAG, "Thread Pool finish.");
     }
-    
+
+    /**
+     * 暂停线程池
+     * 备注：该方法只暂停还没开始运行的线程
+     */
     public void pause() {
         mPauseLock.lock();
         try {
@@ -76,7 +92,11 @@ public class PlusExecutor extends ThreadPoolExecutor {
             mPauseLock.unlock();
         }
     }
-    
+
+    /**
+     * 重启线程池
+     * 备注：恢复线程池中已经被休眠的线程
+     */
     public void restart() {
         mPauseLock.lock();
         try {
