@@ -36,6 +36,11 @@ public class MainActivity extends Activity {
     
     
     private String[] urls = {
-         "www.baidu.com"   
+        "http://img.taopic.com/uploads/allimg/130710/267873-130G011000550.jpg",
+            "http://img5.imgtn.bdimg.com/it/u=1104713303,1290055170&fm=21&gp=0.jpg",
+            "http://img3.imgtn.bdimg.com/it/u=761080875,1194258054&fm=21&gp=0.jpg",
+            "http://img5.imgtn.bdimg.com/it/u=2614807623,3042537006&fm=21&gp=0.jpg",
+            "http://img0.imgtn.bdimg.com/it/u=1906189186,1400341202&fm=21&gp=0.jpg",
+            "http://img0.imgtn.bdimg.com/it/u=1953294160,3802419744&fm=11&gp=0.jpg"
     };
 }

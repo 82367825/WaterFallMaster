@@ -450,10 +450,9 @@ public class ImageLoader {
         // 获取原图宽度 高度
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        Bitmap realBitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length,
-                options);
-        int realWidth = realBitmap.getWidth();
-        int realHeight = realBitmap.getHeight();
+        BitmapFactory.decodeByteArray(buffer, 0, buffer.length, options);
+        int realWidth = options.outWidth;
+        int realHeight = options.outHeight;
         int scaledWidth = 0, scaledHeight = 0;
         
         if (defaultWidth != 0 && defaultHeight != 0) {
@@ -501,9 +500,9 @@ public class ImageLoader {
         // 获取原图宽度 高度
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        Bitmap realBitmap = BitmapFactory.decodeFile(path, options);
-        int realWidth = realBitmap.getWidth();
-        int realHeight = realBitmap.getHeight();
+        BitmapFactory.decodeFile(path, options);
+        int realWidth = options.outWidth;
+        int realHeight = options.outHeight;
         int scaledWidth = 0, scaledHeight = 0;
         if (defaultWidth != 0 && defaultHeight != 0) {
             /* 设置为指定的高度和宽度 */

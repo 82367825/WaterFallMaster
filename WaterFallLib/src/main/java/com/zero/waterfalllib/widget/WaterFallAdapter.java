@@ -34,13 +34,18 @@ public class WaterFallAdapter extends RecyclerView.Adapter<WaterFallHolder> {
     }
 
     @Override
-    public void onBindViewHolder(WaterFallHolder holder, int position) {
+    public void onBindViewHolder(final WaterFallHolder holder, int position) {
         //default image
         holder.getImageView().setImageResource(R.mipmap.ic_launcher);
-        ImageLoader.getInstance().loadBitmapWithWidth(mWaterFallBeenList.get(position).getUrl(), 0, new ImageLoader.ImageLoadListener() {
+        holder.getImageView().setTag(mWaterFallBeenList.get(position).getUrl());
+        ImageLoader.getInstance().loadBitmapWithWidth(mWaterFallBeenList.get(position).getUrl(), 
+                300, new ImageLoader.ImageLoadListener() {
             @Override
             public void onSuccess(String url, Bitmap bitmap) {
-                
+                String tag = (String) holder.getImageView().getTag();
+                if (url.equals(tag)) {
+                    holder.getImageView().setImageBitmap(bitmap);
+                }
             }
 
             @Override
