@@ -17,7 +17,6 @@ public class WaterFallManager {
         return sWaterFallManager;
     }
     private WaterFallManager() {
-        //private
     }
     
     

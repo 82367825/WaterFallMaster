@@ -1,5 +1,6 @@
 package com.zero.waterfalllib.widget;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,25 +35,23 @@ public class WaterFallAdapter extends RecyclerView.Adapter<WaterFallHolder> {
 
     @Override
     public void onBindViewHolder(WaterFallHolder holder, int position) {
-        ImageLoader.getInstance().loadBitmap(
-                mWaterFallBeenList.get(position).getUrl(),
-                holder.getImageView(), R.mipmap.ic_launcher
-                );
-        
+        //default image
+        holder.getImageView().setImageResource(R.mipmap.ic_launcher);
+        ImageLoader.getInstance().loadBitmapWithWidth(mWaterFallBeenList.get(position).getUrl(), 0, new ImageLoader.ImageLoadListener() {
+            @Override
+            public void onSuccess(String url, Bitmap bitmap) {
+                
+            }
+
+            @Override
+            public void onFail(String url) {
+
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mWaterFallBeenList.size();
-    }
-    
-    public void addData(WaterFallBean data, int position) {
-        mWaterFallBeenList.add(position, data);
-        notifyItemChanged(position);
-    }
-    
-    public void removeData(int position) {
-        mWaterFallBeenList.remove(position);
-        notifyItemChanged(position);
     }
 }

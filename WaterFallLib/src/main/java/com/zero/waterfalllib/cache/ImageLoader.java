@@ -251,6 +251,8 @@ public class ImageLoader {
         return mInstance;
     }
 
+    /************************************* 公开方法 start ***************************************/
+    
     /**
      * 公开方法 获取图片
      *
@@ -258,7 +260,7 @@ public class ImageLoader {
      * @param imageLoadListener
      */
     public void loadBitmap(String url, ImageLoadListener imageLoadListener) {
-        LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, -1, imageLoadListener);
+        LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, 0, 0, -1, imageLoadListener);
         WFThreadPoolProxy.getInstance().execute(loaderRunnable);
     }
 
@@ -269,17 +271,57 @@ public class ImageLoader {
      * @param imageView
      */
     public void loadBitmap(String url, ImageView imageView, int errorBitmap) {
-        LoaderRunnable loaderRunnable = new LoaderRunnable(url, imageView, errorBitmap, null);
+        LoaderRunnable loaderRunnable = new LoaderRunnable(url, imageView, 0, 0, errorBitmap, null);
         WFThreadPoolProxy.getInstance().execute(loaderRunnable);
     }
 
+    /**
+     * 公开方法 获取指定宽度的图片
+     * @param url
+     * @param defaultWidth
+     * @param imageLoadListener
+     */
+    public void loadBitmapWithWidth(String url, int defaultWidth, ImageLoadListener imageLoadListener) {
+        LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, -1, defaultWidth, 0, 
+                imageLoadListener);
+        WFThreadPoolProxy.getInstance().execute(loaderRunnable);
+    }
+
+    /**
+     * 公开方法 获取指定高度的图片
+     * @param url
+     * @param defaultHeight
+     * @param imageLoadListener
+     */
+    public void loadBitmapWithHeight(String url, int defaultHeight, ImageLoadListener imageLoadListener) {
+        LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, -1, 0, defaultHeight, 
+                imageLoadListener);
+        WFThreadPoolProxy.getInstance().execute(loaderRunnable);
+    }
+
+    /**
+     * 公开方法 获取制定宽度和高度的图片
+     * @param url
+     * @param defaultWidth
+     * @param defaultHeight
+     * @param imageLoadListener
+     */
+    public void loadBitmapWithSize(String url, int defaultWidth, int defaultHeight, 
+                                   ImageLoadListener imageLoadListener) {
+        LoaderRunnable loaderRunnable = new LoaderRunnable(url, null, -1, defaultWidth, defaultHeight, 
+                imageLoadListener);
+        WFThreadPoolProxy.getInstance().execute(loaderRunnable);
+    }
+    
+    /************************************* 公开方法 end ***************************************/
+    
     /**
      * 同步方法loadBitmap 获取Bitmap
      *
      * @param imageUrl
      * @return
      */
-    private Bitmap loadBitmap(String imageUrl) {
+    private Bitmap loadBitmap(String imageUrl, int defaultWidth, int defaultHeight) {
         
         if(mImageCache == null){
             Log.e(TAG,"the ImageLoader has not init.");
@@ -292,7 +334,7 @@ public class ImageLoader {
         }
         if(LOAD_WAY_NOW == LOAD_WAY.LOAD_NETWORK){
             try {
-                bitmap = downloadFromNetwork(imageUrl);
+                bitmap = downloadFromNetwork(imageUrl, defaultWidth, defaultHeight);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -301,7 +343,7 @@ public class ImageLoader {
                 mImageCache.addBitmapToDiskCache(imageUrl, bitmap);
             }
         }else{
-            bitmap = downloadFromLocal(imageUrl);
+            bitmap = downloadFromLocal(defaultWidth, defaultHeight, imageUrl);
             if(bitmap != null){
                 Log.v(TAG,"READ FROM LOCAL");
                 mImageCache.addBitmapToDiskCache(imageUrl, bitmap);
@@ -326,11 +368,12 @@ public class ImageLoader {
      */
     public class LoaderRunnable implements Runnable {
         private LoaderResult loaderResult = null;
-
+        private int defaultWidth;    //外部指定的宽度
+        private int defaultHeight;   //外部指定的高度
         @Override
         public void run() {
             //开始读取图片
-            Bitmap bitmap = loadBitmap(loaderResult.url);
+            Bitmap bitmap = loadBitmap(loaderResult.url, defaultWidth, defaultHeight);
 
             if (bitmap != null) {
                 loaderResult.bitmap = bitmap;
@@ -341,8 +384,10 @@ public class ImageLoader {
                 mMainHandler.obtainMessage(MESSAGE_POST_RESULT, loaderResult).sendToTarget();
             }
         }
-        public LoaderRunnable(String url, ImageView imageView, int ErrorBitmap, ImageLoadListener 
-                imageLoadListener) {
+        public LoaderRunnable(String url, ImageView imageView, int ErrorBitmap,
+                              int defaultWidth, int defaultHeight, ImageLoadListener imageLoadListener) {
+            this.defaultWidth = defaultWidth;
+            this.defaultHeight = defaultHeight;
             loaderResult = new LoaderResult(imageView, url, ErrorBitmap, imageLoadListener);
         }
     }
@@ -373,7 +418,8 @@ public class ImageLoader {
      * @param urlString 图片的URL地址
      * @return 解析后的Bitmap对象
      */
-    private Bitmap downloadFromNetwork(String urlString) throws IOException {
+    private Bitmap downloadFromNetwork(String urlString, int defaultWidth, int defaultHeight) 
+            throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -390,16 +436,95 @@ public class ImageLoader {
         bos.flush();
         byte[] result = bos.toByteArray();
 
-        return BitmapFactory.decodeByteArray(result, 0, result.length);
+        return scaleBitmap(defaultWidth, defaultHeight, result);
     }
+
+    /**
+     * 获取特定宽度或者特定高度的Bitmap
+     * @param defaultWidth 特定的宽度
+     * @param defaultHeight 特定的高度
+     * @param buffer
+     * @return
+     */
+    private Bitmap scaleBitmap(int defaultWidth, int defaultHeight, byte[] buffer) {
+        // 获取原图宽度 高度
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Bitmap realBitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length,
+                options);
+        int realWidth = realBitmap.getWidth();
+        int realHeight = realBitmap.getHeight();
+        int scaledWidth = 0, scaledHeight = 0;
+        
+        if (defaultWidth != 0 && defaultHeight != 0) {
+            /* 设置为指定的高度和宽度 */
+            scaledWidth = defaultWidth;
+            scaledHeight = defaultHeight;
+        } else if (defaultWidth != 0 && defaultHeight == 0) {
+            /* 根据指定宽度来设置 */
+            scaledWidth = defaultWidth;
+            scaledHeight = realHeight * (scaledWidth / realWidth);
+        } else if (defaultHeight != 0 && defaultWidth == 0) {
+            /* 根据制定高度来设置 */
+            scaledHeight = defaultHeight;
+            scaledWidth = realWidth * (scaledHeight / realHeight);
+        } else if (defaultWidth == 0 && defaultHeight == 0){
+            /* 按照图片实际大小来设置 */
+            scaledWidth = realWidth;
+            scaledHeight = realHeight;
+        }
+        
+        options.inJustDecodeBounds = false;
+        options.outWidth = scaledWidth;
+        options.outHeight = scaledHeight;
+        return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, options);
+    }
+    
     
     /**
      * 从本地读取图片
      * @param path
      * @return
      */
-    private Bitmap downloadFromLocal(String path){
-        return BitmapFactory.decodeFile(path);
+    private Bitmap downloadFromLocal(int defaultWidth, int defaultHeight, String path){
+        return scaleBitmap(defaultWidth, defaultHeight, path);
     }
-    
+
+    /**
+     * 获取特定宽度或者特定高度的Bitmap
+     * @param defaultWidth 特定的宽度
+     * @param defaultHeight 特定的高度
+     * @param path
+     * @return
+     */
+    private Bitmap scaleBitmap(int defaultWidth, int defaultHeight, String path) {
+        // 获取原图宽度 高度
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Bitmap realBitmap = BitmapFactory.decodeFile(path, options);
+        int realWidth = realBitmap.getWidth();
+        int realHeight = realBitmap.getHeight();
+        int scaledWidth = 0, scaledHeight = 0;
+        if (defaultWidth != 0 && defaultHeight != 0) {
+            /* 设置为指定的高度和宽度 */
+            scaledWidth = defaultWidth;
+            scaledHeight = defaultHeight;
+        } else if (defaultWidth != 0 && defaultHeight == 0) {
+            /* 根据指定宽度来设置 */
+            scaledWidth = defaultWidth;
+            scaledHeight = realHeight * (scaledWidth / realWidth);
+        } else if (defaultHeight != 0 && defaultWidth == 0) {
+            /* 根据制定高度来设置 */
+            scaledHeight = defaultHeight;
+            scaledWidth = realWidth * (scaledHeight / realHeight);
+        } else if (defaultWidth == 0 && defaultHeight == 0){
+            /* 按照图片实际大小来设置 */
+            scaledWidth = realWidth;
+            scaledHeight = realHeight;
+        }
+        options.inJustDecodeBounds = false;
+        options.outWidth = scaledWidth;
+        options.outHeight = scaledHeight;
+        return BitmapFactory.decodeFile(path, options);
+    }
 }

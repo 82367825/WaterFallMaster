@@ -9,7 +9,7 @@ public class WaterFallBean {
     private String mUrl;  //图片链接
     private String mTitle;  //标题
     private String mClickLink;  //点击链接
-    
+
     public WaterFallBean() {
     }
     
@@ -42,5 +42,4 @@ public class WaterFallBean {
     public String getClickLink() {
         return this.mClickLink;
     }
-    
 }

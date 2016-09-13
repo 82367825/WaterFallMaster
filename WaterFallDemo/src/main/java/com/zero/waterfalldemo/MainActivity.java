@@ -6,6 +6,8 @@ import android.view.View;
 
 import com.zero.waterfalllib.WaterFallManager;
 import com.zero.waterfalllib.cache.executor.WFThreadPoolProxy;
+import com.zero.waterfalllib.widget.WaterFallView;
+import com.zero.waterfalllib.widget.bean.WaterFallBean;
 import com.zero.waterfallmaster.R;
 
 /**
@@ -14,55 +16,26 @@ import com.zero.waterfallmaster.R;
  */
 public class MainActivity extends Activity {
 
+    private WaterFallView mWaterFallView;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                WFThreadPoolProxy.getInstance().pause();
-            }
-        });
-        
-        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                WFThreadPoolProxy.getInstance().restart();
-            }
-        });
-        
-        findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NumRunnable numRunnable = new NumRunnable();
-                numRunnable.index = mIndex;
-                WFThreadPoolProxy.getInstance().execute(numRunnable);
-                mIndex++;
-            }
-        });
-
-        WFThreadPoolProxy.getInstance();
-
+        WaterFallManager.getInstance().init(this);
+        mWaterFallView = (WaterFallView) findViewById(R.id.waterfall);
+        refreshData();
     }
     
-    private static int mIndex = 0;
-    
-    public class NumRunnable implements Runnable {
-        
-        public int index;
-        
-        @Override
-        public void run() {
-            for (int i = 0 ; i < 50 ; i++) {
-                System.out.println(index);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    private void refreshData() {
+       for (int i = 0 ; i < urls.length ; i++) {
+           WaterFallBean waterFallBean = new WaterFallBean(urls[i], "", "");
+           mWaterFallView.addData(waterFallBean);
+       }
     }
+    
+    
+    private String[] urls = {
+         "www.baidu.com"   
+    };
 }

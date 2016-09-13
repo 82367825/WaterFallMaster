@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class WaterFallView extends BaseWaterFall {
     
-    
     private static final int DEFAULT_COLUMNS_NUM = 2;
     
     private int mColumnsNum = DEFAULT_COLUMNS_NUM;
@@ -50,6 +49,30 @@ public class WaterFallView extends BaseWaterFall {
         initAnimation();
     }
     
+    public void addData(WaterFallBean waterFallBean) {
+        mWaterFallBeenList.add(waterFallBean);
+        mWaterFallAdapter.notifyDataSetChanged();
+    }
+    
+    public void addData(WaterFallBean waterFallBean, int position) {
+        mWaterFallBeenList.add(position, waterFallBean);
+        mWaterFallAdapter.notifyItemChanged(position);
+    }
+    
+    public void remove(WaterFallBean waterFallBean) {
+        mWaterFallBeenList.remove(waterFallBean);
+        mWaterFallAdapter.notifyDataSetChanged();
+    }
+    
+    public void remove(int position) {
+        mWaterFallBeenList.remove(position);
+        mWaterFallAdapter.notifyDataSetChanged();
+    }
+    
+    public List<WaterFallBean> getWaterFallBeenList() {
+        return this.mWaterFallBeenList;
+    }
+    
     @Override
     protected void initRecyclerLayoutManager() {
         /* 设置瀑布流布局 */
@@ -66,11 +89,13 @@ public class WaterFallView extends BaseWaterFall {
 
     @Override
     protected void initDecoration() {
-        
+        /* 设置分割线 */
+        addItemDecoration(new WaterFallDecoration(getContext()));
     }
 
     @Override
     protected void initAnimation() {
+        /* 设置动画 */
         setItemAnimator(new DefaultItemAnimator());
     }
 
