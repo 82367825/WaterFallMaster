@@ -38,6 +38,8 @@ public class WaterFallAdapter extends RecyclerView.Adapter<WaterFallHolder> {
         //default image
         holder.getImageView().setImageResource(R.mipmap.ic_launcher);
         holder.getImageView().setTag(mWaterFallBeenList.get(position).getUrl());
+        holder.getImageView().setAdjustViewBounds(true);
+        holder.getImageView().setMaxHeight(500);
         ImageLoader.getInstance().loadBitmapWithWidth(mWaterFallBeenList.get(position).getUrl(), 
                 300, new ImageLoader.ImageLoadListener() {
             @Override

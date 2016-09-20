@@ -33,8 +33,10 @@ public class MainActivity extends Activity {
            mWaterFallView.addData(waterFallBean);
        }
     }
-    
-    
+
+    /**
+     * 
+     */
     private String[] urls = {
         "http://img.taopic.com/uploads/allimg/130710/267873-130G011000550.jpg",
             "http://img5.imgtn.bdimg.com/it/u=1104713303,1290055170&fm=21&gp=0.jpg",
@@ -44,6 +46,8 @@ public class MainActivity extends Activity {
                     "/78e5fc039245d68839fba560a1c27d1ed31b2415.jpg",
             "http://img0.imgtn.bdimg.com/it/u=1953294160,3802419744&fm=11&gp=0.jpg",
             "http://imga.mumayi.com/android/wallpaper/2012/01/21/sl_600_2012012105503827801816.jpg",
-            "http://img5.imgtn.bdimg.com/it/u=2614807623,3042537006&fm=21&gp=0.jpg"
+            "http://img5.imgtn.bdimg.com/it/u=2614807623,3042537006&fm=21&gp=0.jpg",
+            "http://www.taopic.com/uploads/allimg/120421/107063-12042114025737.jpg",
+            "http://img.taopic.com/uploads/allimg/130711/318756-130G1222R317.jpg"
     };
 }
